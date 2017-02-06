@@ -30,6 +30,8 @@
           AuthorImageParameter: "{{ ami_ids.author }}"
           AuthorInstanceTypeParameter: "{{ author.instance_type }}"
           ComputeKeyPairNameParameter: "{{ compute.key_pair_name }}"
+          AuthorRootVolSizeParameter: "{{ author.root_vol_size }}"
+          AuthorDataVolSizeParameter: "{{ author.data_vol_size }}"
           AuthorTagNameParameter: "{{ stack_prefix }}-{{ author.tag_name }}"
           ApplicationVersionParameter: "{{ compute.application_version }}"
           AuthorLoadBalancerTagNameParameter: "{{ stack_prefix }}-{{ author.load_balancer.tag_name }}"
@@ -40,10 +42,27 @@
       tags:
       - create
 
+    - name: Check if a Stack Exists
+      command: aws cloudformation describe-stacks --stack-name "{{ stack_prefix }}-{{ author.stack_name }}" --query 'Stacks[].StackName'
+      ignore_errors: True
+      register: stack_query
+      tags:
+        - delete
+
+    - name: Report Stack Problem
+      debug:
+        msg: Stack "{{ stack_prefix }}-{{ author.stack_name }}" does not exist or some other errors occured
+      when:
+        "stack_query.rc != 0"
+      tags:
+        - delete
+
     - name: Delete AEM Author Stack
       cloudformation:
         stack_name: "{{ stack_prefix }}-{{ author.stack_name }}"
         region: "{{ aws.region }}"
         state: absent
+      when:
+        "stack_query.rc == 0"
       tags:
       - delete

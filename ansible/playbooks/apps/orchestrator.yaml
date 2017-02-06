@@ -20,6 +20,8 @@
           ComputeKeyPairNameParameter: "{{ compute.key_pair_name }}"
           OrchestratorASGAvailabilityZoneListParameter: "{{ aws.availability_zone_a }}, {{ aws.availability_zone_b }}"
           OrchestratorASGSubnetListParameter: "{{ aem_vpc.orchestrator_subnet_a_id }}, {{ aem_vpc.orchestrator_subnet_b_id }}"
+          OrchestratorRootVolSizeParameter: "{{ orchestrator.root_vol_size }}"
+          OrchestratorDataVolSizeParameter: "{{ orchestrator.data_vol_size }}"
           OrchestratorTagNameParameter: "{{ stack_prefix }}-{{ orchestrator.tag_name }}"
           ApplicationVersionParameter: "{{ compute.application_version }}"
           RolesStackNameParameter: "{{ stack_prefix }}-{{ roles.stack_name }}"
@@ -29,10 +31,27 @@
       tags:
       - create
 
+    - name: Check if a Stack Exists
+      command: aws cloudformation describe-stacks --stack-name "{{ stack_prefix }}-{{ orchestrator.stack_name }}" --query 'Stacks[].StackName'
+      ignore_errors: True
+      register: stack_query
+      tags:
+        - delete
+
+    - name: Report Stack Problem
+      debug:
+        msg: Stack "{{ stack_prefix }}-{{ orchestrator.stack_name }}" does not exist or some other errors occured
+      when:
+        "stack_query.rc != 0"
+      tags:
+        - delete
+
     - name: Delete AEM Orchestrator Stack
       cloudformation:
         stack_name: "{{ stack_prefix }}-{{ orchestrator.stack_name }}"
         region: "{{ aws.region }}"
         state: absent
+      when:
+        "stack_query.rc == 0"
       tags:
       - delete

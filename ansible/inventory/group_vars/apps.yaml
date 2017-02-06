@@ -27,12 +27,12 @@ roles:
   chaos_monkey: AEMStackChaosMonkeyRole
 
 ami_ids:
-  author: ami-7a919619
-  publish: ami-b29f98d1
-  author_dispatcher: ami-4a6b6c29
-  publish_dispatcher: ami-4a6b6c29
-  orchestrator: ami-8f5e59ec
-  chaos_monkey: ami-8f5e59ec
+  author: ami-e12a2c82
+  publish: ami-3834325b
+  author_dispatcher: ami-c3282ea0
+  publish_dispatcher: ami-c3282ea0
+  orchestrator: ami-4c2b2d2f
+  chaos_monkey: ami-4c2b2d2f
 
 security_groups:
   stack_name: aem-security-groups-stack
@@ -91,6 +91,8 @@ publish_dispatcher:
   instance_type: t2.micro
   min_size: 2
   max_size: 2
+  root_vol_size: 20
+  data_vol_size: 20
   load_balancer:
     tag_name: AEM Publish Dispatcher Load Balancer
   tag_name: AEM Publish Dispatcher
@@ -103,12 +105,16 @@ publish:
   instance_type: m3.large
   min_size: 2
   max_size: 2
+  root_vol_size: 20
+  data_vol_size: 20
   tag_name: AEM Publish
 
 author:
   stack_name: aem-author-stack
   instance_profile: cliffs-aem-roles-stack-AuthorInstanceProfile-1KIV5LHVC4WF3
   instance_type: m3.large
+  root_vol_size: 20
+  data_vol_size: 20
   load_balancer:
     tag_name: AEM Author Load Balancer
   tag_name: AEM Author
@@ -120,6 +126,8 @@ author_dispatcher:
   instance_type: t2.micro
   min_size: 2
   max_size: 2
+  root_vol_size: 20
+  data_vol_size: 20
   load_balancer:
     tag_name: AEM Author Dispatcher Load Balancer
   tag_name: AEM Author Dispatcher
@@ -129,12 +137,15 @@ orchestrator:
   stack_name: aem-orchestrator-stack
   instance_profile: cliffs-aem-roles-stack-OrchestratorInstanceProfile-N42J44423JGR
   instance_type: t2.small
+  root_vol_size: 20
+  data_vol_size: 20
   tag_name: AEM Orchestrator
 
 chaos_monkey:
   stack_name: aem-chaos-monkey-stack
   instance_profile: cliffs-aem-roles-stack-ChaosMonkeyInstanceProfile-901SCI66LQGO
   instance_type: t2.micro
+  root_vol_size: 20
   tag_name: AEM Chaos Monkey
 
 dns_records:

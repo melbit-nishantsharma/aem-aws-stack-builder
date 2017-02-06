@@ -35,6 +35,8 @@
           PublishDispatcherASGSubnetListParameter: "{{ aem_vpc.publish_dispatcher_subnet_a_id }}, {{ aem_vpc.publish_dispatcher_subnet_b_id}}"
           PublishDispatcherASGMaxSizeParameter: "{{ publish_dispatcher.max_size }}"
           PublishDispatcherASGMinSizeParameter: "{{ publish_dispatcher.min_size }}"
+          PublishDispatcherRootVolSizeParameter: "{{ publish_dispatcher.root_vol_size }}"
+          PublishDispatcherDataVolSizeParameter: "{{ publish_dispatcher.data_vol_size }}"
           PublishDispatcherTagNameParameter: "{{ stack_prefix }}-{{ publish_dispatcher.tag_name }}"
           ApplicationVersionParameter: "{{ compute.application_version }}"
           PublishDispatcherLoadBalancerTagNameParameter: "{{ stack_prefix }}-{{ publish_dispatcher.load_balancer.tag_name }}"
@@ -46,10 +48,27 @@
       tags:
       - create
 
+    - name: Check if a Stack Exists
+      command: aws cloudformation describe-stacks --stack-name "{{ stack_prefix }}-{{ publish_dispatcher.stack_name }}" --query 'Stacks[].StackName'
+      ignore_errors: True
+      register: stack_query
+      tags:
+        - delete
+
+    - name: Report Stack Problem
+      debug:
+        msg: Stack "{{ stack_prefix }}-{{ publish_dispatcher.stack_name }}" does not exist or some other errors occured
+      when:
+        "stack_query.rc != 0"
+      tags:
+        - delete
+
     - name: Delete AEM Publish Dispatcher Stack
       cloudformation:
         stack_name: "{{ stack_prefix }}-{{ publish_dispatcher.stack_name }}"
         region: "{{ aws.region }}"
         state: absent
+      when:
+        "stack_query.rc == 0"
       tags:
       - delete

@@ -15,11 +15,10 @@ delete_single_stack() {
 }
 
 delete_multi_stacks() {
-  for stack in $1
-  do
-    delete_single_stack "$stack" &
-  done
-  wait
+  export -f delete_single_stack
+  # intentional word split for passing multiple stack types
+  # shellcheck disable=2086
+  parallel delete_single_stack ::: $1
 }
 
 echo "Deleting $stack_prefix AEM stacks..."
