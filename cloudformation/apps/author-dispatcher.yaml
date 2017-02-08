@@ -69,10 +69,6 @@ Parameters:
     Type: String
     Description: The Author Dispatcher Name Tag
 
-  ApplicationVersionParameter:
-    Type: String
-    Description: The Application Version Number
-
   AuthorDispatcherLoadBalancerTagNameParameter:
     Type: String
     Description: The Author Dispatcher Load Balancer Name Tag
@@ -174,7 +170,7 @@ Resources:
             \ mkdir -p /opt/shinesolutions/aem-aws-stack-builder/\n\
             \ aws s3 cp s3://${DataBucketNameParameter}/${ComputeStackPrefixParameter}/stack-init.sh /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh\n\
             \ chmod 755 /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh\n\
-            \ /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh ${DataBucketNameParameter} ${ComputeStackPrefixParameter}\n"
+            \ /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh ${DataBucketNameParameter} ${ComputeStackPrefixParameter} author-dispatcher\n"
   AuthorDispatcherAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -210,10 +206,6 @@ Resources:
         PropagateAtLaunch: true
       - Key: Component
         Value: author-dispatcher
-        PropagateAtLaunch: true
-      - Key: Application Version
-        Value:
-          Ref: ApplicationVersionParameter
         PropagateAtLaunch: true
       VPCZoneIdentifier:
         Ref: AuthorDispatcherASGSubnetListParameter
